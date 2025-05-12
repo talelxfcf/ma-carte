@@ -127,3 +127,44 @@
         const opt = document.createElement('option');
         opt.value = city;
         opt.textContent = city;
+document.getElementById('cityFilter').appendChild(opt);
+      });
+
+      categorySet.forEach(category => {
+        const opt = document.createElement('option');
+        opt.value = category;
+        opt.textContent = category;
+        document.getElementById('categoryFilter').appendChild(opt);
+      });
+    }
+
+    function showMarkers(filteredData) {
+      markers.forEach(marker => map.removeLayer(marker));
+      filteredData.forEach(item => {
+        const marker = L.marker([item.lat, item.lng])
+          .addTo(map)
+          .bindPopup(`<strong>${item.nom}</strong><br>${item.ville}<br>${item.categorie}`);
+        markers.push(marker);
+      });
+    }
+
+    function applyFilters() {
+      const selectedCity = document.getElementById('cityFilter').value;
+      const selectedCategory = document.getElementById('categoryFilter').value;
+
+      const filtered = data.filter(item =>
+        (selectedCity === '' || item.ville === selectedCity) &&
+        (selectedCategory === '' || item.categorie === selectedCategory)
+      );
+
+      showMarkers(filtered);
+    }
+
+    document.getElementById('cityFilter').addEventListener('change', applyFilters);
+    document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+
+    updateFilters();
+    showMarkers(data);
+  </script>
+</body>
+</html>
