@@ -2,211 +2,40 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Carte interactive filtrable</title>
+  <title>Carte avec icônes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Leaflet core -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Leaflet Awesome Markers + Font Awesome 4 -->
+  <!-- Font Awesome 4 + Awesome Markers -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.4/leaflet.awesome-markers.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.4/leaflet.awesome-markers.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <style>
-    #map { height: 90vh; }
-    .filters { padding: 10px; }
-    select { padding: 5px; margin-right: 10px; }
+    #map { height: 100vh; width: 100%; }
   </style>
 </head>
 <body>
-  <div class="filters">
-    <label>Ville:
-      <select id="cityFilter">
-        <option value="">Toutes</option>
-      </select>
-    </label>
-    <label>Catégorie:
-      <select id="categoryFilter">
-        <option value="">Toutes</option>
-      </select>
-    </label>
-  </div>
   <div id="map"></div>
 
   <script>
-    const data = [
-      { ville: "Saint-Denis", nom: "Élite Auto École", categorie: "Auto-école", lat: 48.9320262, lng: 2.3539676 },
-      { ville: "Saint-Denis", nom: "Le Forty", categorie: "Restaurant", lat: 48.9334894, lng: 2.3555449 },
-      { ville: "Saint-Denis", nom: "Paris Délices", categorie: "Restaurant", lat: 48.9331986, lng: 2.3556234 },
-      { ville: "Saint-Denis", nom: "Restaurant Food", categorie: "Restaurant", lat: 48.9324103, lng: 2.355592 },
-      { ville: "Saint-Denis", nom: "Dadi Food", categorie: "Restaurant", lat: 48.9322854, lng: 2.3546436 },
-      { ville: "Saint-Denis", nom: "Bang Cook", categorie: "Restaurant", lat: 48.9346554, lng: 2.3559629 },
-      { ville: "Saint-Denis", nom: "La Finale", categorie: "Restaurant", lat: 48.9302632, lng: 2.3556573 },
-      { ville: "Saint-Denis", nom: "Restaurant & Grillades", categorie: "Restaurant", lat: 48.9320586, lng: 2.3536773 },
-      { ville: "Saint-Denis", nom: "Aux Bonnes Grillades", categorie: "Restaurant", lat: 48.9347403, lng: 2.3562814 },
-      { ville: "Saint-Denis", nom: "Restaurant Saphir", categorie: "Restaurant", lat: 48.935344, lng: 2.3560427 },
-      { ville: "Saint-Denis", nom: "L’original MTM", categorie: "Restaurant", lat: 48.9374293, lng: 2.3509587 },
-      { ville: "Saint-Denis", nom: "Chez nous Grillades", categorie: "Restaurant", lat: 48.9325969, lng: 2.3557312 },
-      { ville: "Saint-Denis", nom: "Poulet Braisé", categorie: "Restaurant", lat: 48.932986, lng: 2.3555917 },
-      { ville: "Saint-Denis", nom: "Boulangerie Mordjana", categorie: "Boulangerie", lat: 48.9339043, lng: 2.3558789 },
-      { ville: "Saint-Denis", nom: "Artisan Boulanger", categorie: "Boulangerie", lat: 48.9322638, lng: 2.3545006 },
-      { ville: "Saint-Denis", nom: "Dubai Center", categorie: "Vêtements", lat: 48.9349478, lng: 2.3559963 },
-      { ville: "Saint-Denis", nom: "Happy Star", categorie: "Vêtements", lat: 48.936794, lng: 2.3517267 },
-      { ville: "Saint-Denis", nom: "Ma bonne étoile shoes", categorie: "Vêtements", lat: 48.9371686, lng: 2.3562586 },
-      { ville: "Saint-Denis", nom: "Bia wear", categorie: "Vêtements", lat: 48.9366042, lng: 2.3533072 },
-      { ville: "Saint-Denis", nom: "Mab", categorie: "Vêtements", lat: 48.9355438, lng: 2.3558907 },
-      { ville: "Saint-Denis", nom: "El Amal", categorie: "Vêtements", lat: 48.9354252, lng: 2.3560534 },
-      { ville: "Saint-Denis", nom: "Librairie Tawhid", categorie: "Librairie", lat: 48.9339281, lng: 2.356301 },
-      { ville: "Saint-Denis", nom: "BD plus", categorie: "Téléphonie Mobile", lat: 48.9308559, lng: 2.3547689 },
-      { ville: "Saint-Denis", nom: "Presse La Résistance", categorie: "Téléphonie Mobile", lat: 48.9329029, lng: 2.3551455 },
-      { ville: "Saint-Denis", nom: "Lyca Mobile", categorie: "Téléphonie Mobile", lat: 48.9320262, lng: 2.3539676 },
-      { ville: "Saint-Denis", nom: "Pharmacie de la Porte de Paris", categorie: "Pharmacie", lat: 48.9308164, lng: 2.3562432 },
-      { ville: "Saint-Denis", nom: "Aprium Pharmacie du Square", categorie: "Pharmacie", lat: 48.9311283, lng: 2.3538253 },
-      { ville: "Saint-Denis", nom: "Pharmacie de l’Esplanade", categorie: "Pharmacie", lat: 48.9330016, lng: 2.3552792 },
-      { ville: "Saint-Denis", nom: "Boucherie Al Sunna", categorie: "Boucherie", lat: 48.9333273, lng: 2.3555024 },
-      { ville: "Paris ", nom: "Mini Prix market", categorie: "Alimentation Général", lat: 48.9344016, lng: 2.3536958 },
-      { ville: "Saint-Denis", nom: "Minha Bangla Bazar", categorie: "Alimentation Général", lat: 48.9334894, lng: 2.3555449 },
-      { ville: "Saint-Denis", nom: "Alimentation petit prix", categorie: "Alimentation Général", lat: 48.931184, lng: 2.356282 },
-      { ville: "Saint-Denis", nom: "Sabbah Oriental", categorie: "Alimentation Général", lat: 48.9311283, lng: 2.3538253 },
-      { ville: "Saint-Denis", nom: "Épicerie Antioche", categorie: "Alimentation Général", lat: 48.9358423, lng: 2.3559259 },
-      { ville: "Paris 17", nom: "Alpha Burger", categorie: "Restaurant", lat: 48.8878728, lng: 2.3251545 },
-      { ville: "Paris 17", nom: "Los Pollos", categorie: "Restaurant", lat: 48.8964892, lng: 2.3284429 },
-      { ville: "Paris 17", nom: "Le parlme d'or (138)", categorie: "Restaurant", lat: 48.890884, lng: 2.3199136 },
-      { ville: "Paris 17", nom: "Kebab Élysée", categorie: "Restaurant", lat: 48.876058, lng: 2.2896948 },
-      { ville: "Paris 18", nom: "Restaurant 786", categorie: "Restaurant", lat: 48.8903762, lng: 2.3493191 },
-      { ville: "Paris 18", nom: "La Perle Sucrée", categorie: "Restaurant", lat: 48.8946952, lng: 2.3278379 },
-      { ville: "Paris 18", nom: "Best Cook", categorie: "Restaurant", lat: 48.896968, lng: 2.32859 },
-      { ville: "Paris 18", nom: "Binks", categorie: "Restaurant", lat: 48.8969827, lng: 2.3289373 },
-      { ville: "Paris 18", nom: "Tchikito", categorie: "Restaurant", lat: 48.8987498, lng: 2.3652672 },
-      { ville: "Paris 18", nom: "Boulangerie pain au blé dur", categorie: "Boulangerie", lat: 48.8964996, lng: 2.3386469 },
-      { ville: "Paris 19", nom: "Boucherie AVS", categorie: "Boucherie", lat: 48.8846304, lng: 2.3650624 },
-      { ville: "Paris 5", nom: "Sushi Konichiwa", categorie: "Restaurant", lat: 48.8372493, lng: 2.3518415 },
-      { ville: "Créteil", nom: "Librairie Averroes", categorie: "Librairie", lat: 48.781621, lng: 2.446082 },
-      { ville: "Créteil", nom: "Pharmacie Des Sarrazins", categorie: "Pharmacie", lat: 48.769973, lng: 2.470572 },
-      { ville: "Cergy", nom: "O’tacos", categorie: "Restaurant", lat: 49.036968, lng: 2.077381 },
-      { ville: "Cergy", nom: "B. Street", categorie: "Restaurant", lat: 49.038629, lng: 2.0821377 },
-      { ville: "Clichy", nom: "Boucherie", categorie: "Boucherie", lat: 48.902656, lng: 2.302017 },
-      { ville: "Clichy", nom: "Crust", categorie: "Restaurant", lat: 48.904903, lng: 2.302407 },
-      { ville: "Pantin", nom: "Ben Omrane", categorie: "Alimentation Général", lat: 48.902917, lng: 2.405156 },
-      { ville: "Saint Ouen", nom: "Boucherie Wakil", categorie: "Boucherie", lat: 48.917977, lng: 2.332318 },
-      { ville: "Garges-Les-Gonesses", nom: "Tohido", categorie: "Restaurant", lat: 48.968179, lng: 2.414293 },
-      { ville: "Clamart", nom: "Ferme KISSI", categorie: "Boucherie", lat: 48.997622, lng: 2.48003 },
-      { ville: "Clamart", nom: "Boucherie la Ferme de Clamart", categorie: "Boucherie", lat: 48.7833749, lng: 2.2471898 },
-      { ville: "Belfort", nom: "Bledi Market", categorie: "Boucherie", lat: 47.6387395, lng: 6.8775895 },
-      { ville: "Bobigny", nom: "Bazar oriental", categorie: "Alimentation Général", lat: 48.9092394, lng: 2.4384837 },
-      { ville: "Bobigny", nom: "Bazar de bobigny", categorie: "Alimentation Général", lat: 48.908865, lng: 2.437988 },
-      { ville: "Bobigny", nom: "City Style", categorie: "Coiffeur", lat: 48.9096836, lng: 2.4360132 },
-      { ville: "Bobigny", nom: "L’Atelier Artisan", categorie: "Boulangerie", lat: 48.883975, lng: 2.408092 },
-      { ville: "Bobigny", nom: "Boucherie de la Ferme", categorie: "Boucherie", lat: 48.8839762, lng: 2.4080941 },
-      { ville: "Noisy-Le-Sec", nom: "Cimatex", categorie: "Boutique Bâtiment", lat: 48.897679, lng: 2.441951 },
-      { ville: "Villeneuve-La-Garenne", nom: "Obsessed", categorie: "Vêtements", lat: 48.9256297, lng: 2.3286593 },
-      { ville: "Villeneuve-La-Garenne", nom: "Belmiraz", categorie: "Vêtements", lat: 48.9256297, lng: 2.3286593 },
-      { ville: "Villeneuve-La-Garenne", nom: "Zegafredo Zanetti", categorie: "Restaurant", lat: 48.9256297, lng: 2.3286593 },
-      { ville: "Villeneuve-La-Garenne", nom: "Fresh Factory", categorie: "Restaurant", lat: 48.9256297, lng: 2.3286593 },
-      { ville: "Villeneuve-La-Garenne", nom: "Bubble Bae", categorie: "Salon de Thé", lat: 48.9256297, lng: 2.3286593 },
-      { ville: "Villeneuve-La-Garenne", nom: "Madison Square Barber", categorie: "Coiffeur", lat: 48.9256297, lng: 2.3286593 },
-      { ville: "Gennevilliers", nom: "Le Twilson", categorie: "Restaurant", lat: 48.91876220703125, lng: 2.30576491355896 },
-      { ville: "Gennevilliers", nom: "Dubai Mall", categorie: "Librairie", lat: 48.931785, lng: 2.289381 },
-      { ville: "Aubervilliers", nom: "Cimatex", categorie: "Boutique Bâtiment", lat: 48.9052643, lng: 2.3814492 },
-      { ville: "Ivry-Sur-Seine", nom: "Khao Prat", categorie: "Restaurant", lat: 48.8172901, lng: 2.3990945 },
-      { ville: "Ivry-Sur-Seine", nom: "Chez L’Ancien", categorie: "Restaurant", lat: 48.8174065, lng: 2.3989573 },
-      { ville: "Le Thillay", nom: "Ferme KISSI", categorie: "Boucherie", lat: 48.997622, lng: 2.48003 }
-    ];
+    const map = L.map('map').setView([48.933, 2.355], 13);
 
-    const map = L.map('map').setView([48.85, 2.35], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
     }).addTo(map);
 
-    const markers = [];
-
-    function updateFilters() {
-      const citySelect = document.getElementById('cityFilter');
-      const categorySelect = document.getElementById('categoryFilter');
-      citySelect.length = 1;
-      categorySelect.length = 1;
-
-      const cities = [...new Set(data.map(item => item.ville))];
-      const categories = [...new Set(data.map(item => item.categorie))];
-
-      cities.forEach(city => {
-        const option = document.createElement('option');
-        option.value = city;
-        option.textContent = city;
-        citySelect.appendChild(option);
-      });
-
-      categories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat;
-        option.textContent = cat;
-        categorySelect.appendChild(option);
-      });
-    }
-
-    function getIconForCategory(category) {
-      const iconMap = {
-        "Restaurant": { icon: 'cutlery', markerColor: 'red' },
-        "Boulangerie": { icon: 'circle-o', markerColor: 'orange' },
-        "Boucherie": { icon: 'shopping-cart', markerColor: 'darkred' },
-        "Librairie": { icon: 'book', markerColor: 'blue' },
-        "Téléphonie Mobile": { icon: 'mobile', markerColor: 'darkblue' },
-        "Pharmacie": { icon: 'plus-square', markerColor: 'green' },
-        "Vêtements": { icon: 'shopping-bag', markerColor: 'purple' },
-        "Alimentation Général": { icon: 'shopping-basket', markerColor: 'cadetblue' },
-        "Auto-école": { icon: 'car', markerColor: 'black' },
-        "Coiffeur": { icon: 'scissors', markerColor: 'pink' },
-        "Boutique Bâtiment": { icon: 'wrench', markerColor: 'gray' },
-        "Salon de Thé": { icon: 'coffee', markerColor: 'lightgreen' }
-      };
-
-      const { icon, markerColor } = iconMap[category] || { icon: 'map-marker', markerColor: 'blue' };
-
-      return L.AwesomeMarkers.icon({
-        icon: icon,
+    // Création d'un marqueur avec AwesomeMarker et icône FontAwesome
+    const marker = L.marker([48.933, 2.355], {
+      icon: L.AwesomeMarkers.icon({
+        icon: 'cutlery', // icône FA4 : 'cutlery' = couteau et fourchette
         prefix: 'fa',
-        markerColor: markerColor
-      });
-    }
-
-    function showMarkers(filteredData) {
-      markers.forEach(marker => map.removeLayer(marker));
-      markers.length = 0;
-
-      filteredData.forEach(item => {
-        const marker = L.marker([item.lat, item.lng], {
-          icon: getIconForCategory(item.categorie)
-        })
-        .addTo(map)
-        .bindPopup(`<strong>${item.nom}</strong><br>${item.ville}<br>${item.categorie}`);
-        markers.push(marker);
-      });
-
-      if (filteredData.length > 0) {
-        const bounds = L.latLngBounds(filteredData.map(d => [d.lat, d.lng]));
-        map.fitBounds(bounds);
-      }
-    }
-
-    function applyFilters() {
-      const selectedCity = document.getElementById('cityFilter').value;
-      const selectedCategory = document.getElementById('categoryFilter').value;
-
-      const filtered = data.filter(item =>
-        (selectedCity === '' || item.ville === selectedCity) &&
-        (selectedCategory === '' || item.categorie === selectedCategory)
-      );
-
-      showMarkers(filtered);
-    }
-
-    document.getElementById('cityFilter').addEventListener('change', applyFilters);
-    document.getElementById('categoryFilter').addEventListener('change', applyFilters);
-
-    updateFilters();
-    showMarkers(data);
+        markerColor: 'red'
+      })
+    }).addTo(map).bindPopup("Restaurant Le Forty");
   </script>
 </body>
 </html>
