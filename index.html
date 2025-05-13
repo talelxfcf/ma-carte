@@ -5,6 +5,9 @@
   <title>Carte interactive filtrable</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.4/leaflet.awesome-markers.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.4/leaflet.awesome-markers.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
     #map { height: 90vh; }
     .filters { padding: 10px; }
@@ -143,14 +146,41 @@
       });
     }
 
+    function getIconForCategory(category) {
+      const iconMap = {
+        "Restaurant": { icon: 'utensils', markerColor: 'red' },
+        "Boulangerie": { icon: 'bread-slice', markerColor: 'orange' },
+        "Boucherie": { icon: 'drumstick-bite', markerColor: 'darkred' },
+        "Librairie": { icon: 'book', markerColor: 'blue' },
+        "Téléphonie Mobile": { icon: 'mobile-alt', markerColor: 'darkblue' },
+        "Pharmacie": { icon: 'prescription-bottle-alt', markerColor: 'green' },
+        "Vêtements": { icon: 'tshirt', markerColor: 'purple' },
+        "Alimentation Général": { icon: 'shopping-basket', markerColor: 'cadetblue' },
+        "Auto-école": { icon: 'car', markerColor: 'black' },
+        "Coiffeur": { icon: 'cut', markerColor: 'pink' },
+        "Boutique Bâtiment": { icon: 'hammer', markerColor: 'gray' },
+        "Salon de Thé": { icon: 'coffee', markerColor: 'lightgreen' }
+      };
+
+      const { icon, markerColor } = iconMap[category] || { icon: 'map-marker-alt', markerColor: 'blue' };
+
+      return L.AwesomeMarkers.icon({
+        icon: icon,
+        prefix: 'fa',
+        markerColor: markerColor
+      });
+    }
+
     function showMarkers(filteredData) {
       markers.forEach(marker => map.removeLayer(marker));
       markers.length = 0;
 
       filteredData.forEach(item => {
-        const marker = L.marker([item.lat, item.lng])
-          .addTo(map)
-          .bindPopup(`<strong>${item.nom}</strong><br>${item.ville}<br>${item.categorie}`);
+        const marker = L.marker([item.lat, item.lng], {
+          icon: getIconForCategory(item.categorie)
+        })
+        .addTo(map)
+        .bindPopup(`<strong>${item.nom}</strong><br>${item.ville}<br>${item.categorie}`);
         markers.push(marker);
       });
 
