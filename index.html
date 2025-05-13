@@ -4,10 +4,16 @@
   <meta charset="utf-8" />
   <title>Carte interactive filtrable</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet core -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Leaflet Awesome Markers + Font Awesome 4 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.4/leaflet.awesome-markers.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.4/leaflet.awesome-markers.js"></script>
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
   <style>
     #map { height: 90vh; }
     .filters { padding: 10px; }
@@ -29,7 +35,6 @@
   </div>
   <div id="map"></div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const data = [
       { ville: "Saint-Denis", nom: "Élite Auto École", categorie: "Auto-école", lat: 48.9320262, lng: 2.3539676 },
@@ -120,49 +125,44 @@
     function updateFilters() {
       const citySelect = document.getElementById('cityFilter');
       const categorySelect = document.getElementById('categoryFilter');
-
       citySelect.length = 1;
       categorySelect.length = 1;
 
-      const citySet = new Set();
-      const categorySet = new Set();
-      data.forEach(item => {
-        citySet.add(item.ville);
-        categorySet.add(item.categorie);
+      const cities = [...new Set(data.map(item => item.ville))];
+      const categories = [...new Set(data.map(item => item.categorie))];
+
+      cities.forEach(city => {
+        const option = document.createElement('option');
+        option.value = city;
+        option.textContent = city;
+        citySelect.appendChild(option);
       });
 
-      citySet.forEach(city => {
-        const opt = document.createElement('option');
-        opt.value = city;
-        opt.textContent = city;
-        citySelect.appendChild(opt);
-      });
-
-      categorySet.forEach(category => {
-        const opt = document.createElement('option');
-        opt.value = category;
-        opt.textContent = category;
-        categorySelect.appendChild(opt);
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
       });
     }
 
     function getIconForCategory(category) {
       const iconMap = {
-        "Restaurant": { icon: 'utensils', markerColor: 'red' },
-        "Boulangerie": { icon: 'bread-slice', markerColor: 'orange' },
-        "Boucherie": { icon: 'drumstick-bite', markerColor: 'darkred' },
+        "Restaurant": { icon: 'cutlery', markerColor: 'red' },
+        "Boulangerie": { icon: 'circle-o', markerColor: 'orange' },
+        "Boucherie": { icon: 'shopping-cart', markerColor: 'darkred' },
         "Librairie": { icon: 'book', markerColor: 'blue' },
-        "Téléphonie Mobile": { icon: 'mobile-alt', markerColor: 'darkblue' },
-        "Pharmacie": { icon: 'prescription-bottle-alt', markerColor: 'green' },
-        "Vêtements": { icon: 'tshirt', markerColor: 'purple' },
+        "Téléphonie Mobile": { icon: 'mobile', markerColor: 'darkblue' },
+        "Pharmacie": { icon: 'plus-square', markerColor: 'green' },
+        "Vêtements": { icon: 'shopping-bag', markerColor: 'purple' },
         "Alimentation Général": { icon: 'shopping-basket', markerColor: 'cadetblue' },
         "Auto-école": { icon: 'car', markerColor: 'black' },
-        "Coiffeur": { icon: 'cut', markerColor: 'pink' },
-        "Boutique Bâtiment": { icon: 'hammer', markerColor: 'gray' },
+        "Coiffeur": { icon: 'scissors', markerColor: 'pink' },
+        "Boutique Bâtiment": { icon: 'wrench', markerColor: 'gray' },
         "Salon de Thé": { icon: 'coffee', markerColor: 'lightgreen' }
       };
 
-      const { icon, markerColor } = iconMap[category] || { icon: 'map-marker-alt', markerColor: 'blue' };
+      const { icon, markerColor } = iconMap[category] || { icon: 'map-marker', markerColor: 'blue' };
 
       return L.AwesomeMarkers.icon({
         icon: icon,
